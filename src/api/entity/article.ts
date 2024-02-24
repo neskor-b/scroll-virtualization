@@ -1,10 +1,18 @@
-type article = {
-    title: string
-    description: string
-    author: string
-    url: string
-    urlToImage: string
-    publishedAt: string
+type Source =  {
+    id: string;
+    name: string;
 }
 
-export default article;
+type Article =  {
+    source: Source;
+    author: string;
+    title: string;
+    description: string;
+    url: string;
+    urlToImage: string;
+    publishedAt: string;
+    content: string;
+}
+
+export default Article;
+  

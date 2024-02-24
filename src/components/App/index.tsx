@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ChakraProvider } from '@chakra-ui/react'
 
 // UI
@@ -9,33 +9,34 @@ import { Box } from 'components/App/styled';
 
 // components
 import Search from 'components/Search';
+import NewsItem from 'components/NewsItem';
+import ToggleColorMode from 'components/ToggleColorMode';
+import Spinner from 'components/Spinner';
+import VirtualScroll from 'components/VirtualScroll';
 
-// api
-import { apiGetNews } from 'api/apiRequests';
+// hooks
+import useArticles from 'hooks/useArticle';
 
 function App() {
+  const { articles, isLoading, params, changeParam } = useArticles();
+  const changSearch = changeParam('q');
+  const changePage = changeParam('page');
 
-  const fetchBooks = async () => {
-    try {
-      const data = await apiGetNews({
-        page: 1,
-        pageSize: 1
-      });
-      console.log(data);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  useEffect(() => {
-    fetchBooks();
-  }, [])
 
   return (
     <ChakraProvider>
       <Center>
         <Box>
-            <Search />
+            <ToggleColorMode/>
+            <Search value={params.q} onChange={e => changSearch(e.target.value)} />
+            <VirtualScroll 
+                data={articles}
+                uniqueKey='title'
+                itemFixedHeight={170}
+                itemRender={article => <NewsItem article={article} />}
+                onScrollDown={() => changePage(params.page + 1)}
+            />
+            <Spinner size='xl' isLoading={isLoading} />
         </Box>
       </Center>
     </ChakraProvider>
