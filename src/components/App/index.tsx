@@ -18,7 +18,7 @@ import VirtualScroll from 'components/VirtualScroll';
 import useArticles from 'hooks/useArticle';
 
 function App() {
-  const { articles, isLoading, params, changeParam } = useArticles();
+  const { articles, isLoading, params, hasNext, changeParam } = useArticles();
   const changSearch = changeParam('q');
   const changePage = changeParam('page');
 
@@ -33,6 +33,7 @@ function App() {
                 data={articles}
                 uniqueKey='title'
                 itemFixedHeight={170}
+                unobserve={hasNext}
                 itemRender={article => <NewsItem article={article} />}
                 onScrollDown={() => changePage(params.page + 1)}
             />

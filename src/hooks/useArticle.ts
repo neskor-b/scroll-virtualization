@@ -20,6 +20,7 @@ const useArticles = () => {
     const [articles, setArticles] = useState<Article[]>([]);
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [hasNext, setHasNextPage] = useState(true);
     const [params, setParams] = useState<Params>({ page: 1, pageSize: 10, q: '' });
 
     const fetchArticles = async (withrReset: boolean = true) => {
@@ -32,8 +33,10 @@ const useArticles = () => {
             } else {
                 setArticles(prevArticles => [...prevArticles, ...data.articles]);
             }
+            data.articles.length === 0 ? setHasNextPage(false) : setHasNextPage(true);
         } catch (error) {
             setIsError(true);
+            setHasNextPage(false);
             console.error(error);
         } finally {
             setIsLoading(false);
@@ -56,7 +59,7 @@ const useArticles = () => {
         fetchArticles(false);
     }, [params.page])
 
-    return { articles, isError, isLoading, params, fetchArticles, changeParam };
+    return { articles, isError, isLoading, params, hasNext, fetchArticles, changeParam };
 }
 
 export default useArticles;
