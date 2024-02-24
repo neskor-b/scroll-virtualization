@@ -22,7 +22,6 @@ function App() {
   const changSearch = changeParam('q');
   const changePage = changeParam('page');
 
-
   return (
     <ChakraProvider>
       <Center>
@@ -33,7 +32,7 @@ function App() {
                 data={articles}
                 uniqueKey='title'
                 itemFixedHeight={170}
-                unobserve={hasNext}
+                unobserve={!hasNext}
                 itemRender={article => <NewsItem article={article} />}
                 onScrollDown={() => changePage(params.page + 1)}
             />

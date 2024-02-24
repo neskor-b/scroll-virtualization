@@ -22,7 +22,7 @@ const VirtualScroll: FC<Props> = ({ data, uniqueKey, itemFixedHeight, unobserve,
         if (entry.isIntersecting) {
             onScrollDown();
         }
-    }, { threshold: 1.0, rootMargin: `${itemFixedHeight * 2}px` });
+    }, { threshold: 1.0, rootMargin: `${itemFixedHeight * 3}px` });
     
 
     useEffect(() => {
