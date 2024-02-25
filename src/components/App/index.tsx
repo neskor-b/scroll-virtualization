@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ChakraProvider } from '@chakra-ui/react'
 
 // UI
@@ -22,6 +22,12 @@ function App() {
   const changSearch = changeParam('q');
   const changePage = changeParam('page');
 
+  const changePageHandler = () => {
+    if (hasNext) {
+      changePage(params.page + 1);
+    }
+  };
+
   return (
     <ChakraProvider>
       <Center>
@@ -32,9 +38,9 @@ function App() {
                 data={articles}
                 uniqueKey='title'
                 itemFixedHeight={170}
-                unobserve={!hasNext}
+                visibleCount={params.pageSize}
                 itemRender={article => <NewsItem article={article} />}
-                onScrollDown={() => changePage(params.page + 1)}
+                onScrollDown={changePageHandler}
             />
             <Spinner size='xl' isLoading={isLoading} />
         </Box>

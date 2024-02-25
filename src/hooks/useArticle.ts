@@ -45,24 +45,33 @@ const useArticles = () => {
 
     // TODO MOCK - delete
     const fetchArticles = (test: boolean = true) => {
-        const newRandomArticles = Array.from({ length: 10 }, () => ({
-            source: {
-                id: '1',
-                name: '1',
-            },
-            author: '1',
-            title: '1',
-            description: '1',
-            url: '1',
-            urlToImage: '1',
-            publishedAt: '1',
-            content: '1'
-        }))
-        
-        setArticles(prevArticles => [...prevArticles, ...newRandomArticles]);
+        setIsLoading(true);
+        let newRandomArticles: Article[] = [];
+
+        for (let i = 0 || articles.length; i < (articles.length + 10); i++) {
+            newRandomArticles.push({
+                source: {
+                    id: 'test',
+                    name: 'test'
+                },
+                author: '',
+                title: `${i + 1} name`,
+                description: '',
+                url: '',
+                urlToImage: '',
+                publishedAt: '',
+                content: `${i}`
+            });
+        }
+        if (articles.length <= 20) {
+            setArticles(prevArticles => [...prevArticles, ...newRandomArticles]);
+        } else {
+            setHasNextPage(false);
+        }
+        setIsLoading(false);
     }
 
-    const changeParam = (paramName: keyof Params) => (value: string | number) => {
+    const changeParam = (paramName: keyof Params) => (value: string | number) => {        
         setParams({ ...params, [paramName]: value });
     }
 
@@ -75,7 +84,7 @@ const useArticles = () => {
     }, [params.q])
 
     useUpdateEffect(() => {
-        fetchArticles(false);        
+        fetchArticles(false);
     }, [params.page])
 
     return { articles, isError, isLoading, params, hasNext, fetchArticles, changeParam };
