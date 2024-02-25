@@ -24,7 +24,7 @@ function App() {
   const changePage = changeParam('page');
 
   const changePageHandler = () => {
-    if (hasNext) {
+    if (hasNext && !isLoading) {
       changePage(params.page + 1);
     }
   };
