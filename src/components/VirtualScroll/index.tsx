@@ -65,8 +65,8 @@ const VirtualScroll: FC<Props> = ({ data, uniqKey, config, itemRender, onScrollD
         topObserver.disconnect();
     }, []);
 
-    const skipWithBuffer = virtualItems > 0 ? virtualItems - config.bufferCount : 0
-    const visibleData = data.slice(skipWithBuffer, virtualItems + config.visibleCount);
+    const skip = virtualItems > 0 ? virtualItems - config.bufferCount : 0
+    const visibleData = data.slice(skip, virtualItems + config.visibleCount);
     
     return (
             <Stack spacing={`${config.listGap}px`}>
@@ -77,7 +77,7 @@ const VirtualScroll: FC<Props> = ({ data, uniqKey, config, itemRender, onScrollD
                         return (
                             <Box 
                                 ref={topSentinelRef} 
-                                mt={`${skipWithBuffer * (config.itemFixedHeight + config.listGap)}px`} 
+                                mt={`${skip * (config.itemFixedHeight + config.listGap)}px`} 
                                 height={itemHeight} 
                                 key={key}
                             >
