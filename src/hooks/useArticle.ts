@@ -23,52 +23,24 @@ const useArticles = () => {
     const [hasNext, setHasNextPage] = useState(true);
     const [params, setParams] = useState<Params>({ page: 1, pageSize: 10, q: '' });
 
-    // const fetchArticles = async (withrReset: boolean = true) => {
-    //     setIsLoading(true);
-    //     try {
-    //         withrReset && setArticles([]);
-    //         const { data } = await apiGetNews(params);
-    //         if (withrReset) {
-    //             setArticles(data.articles);
-    //         } else {
-    //             setArticles(prevArticles => [...prevArticles, ...data.articles]);
-    //         }
-    //         data.articles.length === 0 ? setHasNextPage(false) : setHasNextPage(true);
-    //     } catch (error) {
-    //         setIsError(true);
-    //         setHasNextPage(false);
-    //         console.error(error);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // }
-
-    // TODO MOCK - delete
-    const fetchArticles = (test: boolean = true) => {
+    const fetchArticles = async (withrReset: boolean = true) => {
         setIsLoading(true);
-        let newRandomArticles: Article[] = [];
-
-        for (let i = 0 || articles.length; i < (articles.length + 10); i++) {
-            newRandomArticles.push({
-                source: {
-                    id: 'test',
-                    name: 'test'
-                },
-                author: '',
-                title: `${i + 1} name`,
-                description: '',
-                url: '',
-                urlToImage: '',
-                publishedAt: '',
-                content: `${i}`
-            });
-        }
-        if (articles.length <= 20) {
-            setArticles(prevArticles => [...prevArticles, ...newRandomArticles]);
-        } else {
+        try {
+            withrReset && setArticles([]);
+            const { data } = await apiGetNews(params);
+            if (withrReset) {
+                setArticles(data.articles);
+            } else {
+                setArticles(prevArticles => [...prevArticles, ...data.articles]);
+            }
+            data.articles.length === 0 ? setHasNextPage(false) : setHasNextPage(true);
+        } catch (error) {
+            setIsError(true);
             setHasNextPage(false);
+            console.error(error);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }
 
     const changeParam = (paramName: keyof Params) => (value: string | number) => {        

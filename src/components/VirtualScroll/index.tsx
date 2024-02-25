@@ -6,39 +6,43 @@ import { Stack, Box } from '@chakra-ui/react';
 
 type Props = {
     data: any[];
-    uniqueKey: string;
-    itemFixedHeight: number;
-    visibleCount: number;
+    uniqKey: string;
+    config: {
+        itemFixedHeight: number,
+        visibleCount: number,
+        bufferCount: number,
+        listGap: number
+    }
     itemRender: (data: any, index: number) => React.ReactNode;
     onScrollDown: () => void;
 }
 
-const TOP_SENTINEL_ID = 'top-sentinel';
-const BOTTOM_SENTINEL_ID = 'bottom-sentinel';
+const VirtualScroll: FC<Props> = ({ data, uniqKey, config, itemRender, onScrollDown }) => {
+    const [virtualItems, setVirtualItems] = useState(0);
 
-const VirtualScroll: FC<Props> = ({ data, uniqueKey, itemFixedHeight, visibleCount, itemRender, onScrollDown }) => {
-    const [topSkip, setTopSkip] = useState(0);
+    const botomObserverConfig = { threshold: 0.1, rootMargin: `${(config.itemFixedHeight + config.listGap) * config.bufferCount}px 0px 0px 0px` }
+    const topObserverConfig = { threshold: 0.1, rootMargin: `0px 0px ${(config.itemFixedHeight + config.listGap) * config.bufferCount}px 0px` }
 
     const botomObserver = new IntersectionObserver((entries) => {
         const [entry] = entries;
         if (entry.isIntersecting) {
             onScrollDown();
-            setTopSkip(prev => {
-                if (visibleCount + prev < data.length) {
-                    return prev + 3
+            setVirtualItems(prev => {
+                if (config.visibleCount + prev < data.length) {
+                    return prev + config.bufferCount
                 } else {
                     return prev
                 }
             });
         }
-    }, { threshold: 0.1, rootMargin: `${(itemFixedHeight + 10) * 3}px 0px` });
+    }, botomObserverConfig);
 
     const topObserver = new IntersectionObserver((entries) => {
         const [entry] = entries;
         if (entry.isIntersecting) {
-            setTopSkip(prev => (prev > 3 ? prev - 3 : 0))
+            setVirtualItems(prev => (prev > config.bufferCount ? prev - config.bufferCount : 0))
         }
-    }, { threshold: 0.1, rootMargin: `0px 0px ${(itemFixedHeight + 10) * 3}px 0px` });
+    }, topObserverConfig);
     
     const bottomSentinelRef = useCallback((node: any) => {
         botomObserver.disconnect()
@@ -56,22 +60,26 @@ const VirtualScroll: FC<Props> = ({ data, uniqueKey, itemFixedHeight, visibleCou
         return node;
     }, [data]);
 
-    useEffect(() => () => botomObserver.disconnect(), []);
+    useEffect(() => () => {
+        botomObserver.disconnect();
+        topObserver.disconnect();
+    }, []);
 
-    const visibleData = data.slice(topSkip > 0 ? topSkip - 3 : 0, topSkip + visibleCount);
+    const skipWithBuffer = virtualItems > 0 ? virtualItems - config.bufferCount : 0
+    const visibleData = data.slice(skipWithBuffer, virtualItems + config.visibleCount);
     
     return (
-            <Stack spacing="10px">
+            <Stack spacing={`${config.listGap}px`}>
                 {visibleData.map((item, index) => {
+                    const key = `${item[uniqKey]}-${index}`;
+                    const itemHeight = `${config.itemFixedHeight}px`;
                     if (index === 0) {
                         return (
                             <Box 
-                                opacity={0.5}
-                                id={TOP_SENTINEL_ID} 
-                                mt={`${(topSkip > 0 ? topSkip - 3 : 0) * (itemFixedHeight + 10)}px`} 
                                 ref={topSentinelRef} 
-                                height={`${itemFixedHeight}px`} 
-                                key={`${item[uniqueKey]}-${index}`}
+                                mt={`${skipWithBuffer * (config.itemFixedHeight + config.listGap)}px`} 
+                                height={itemHeight} 
+                                key={key}
                             >
                                 {itemRender(item, index)}
                             </Box>
@@ -80,18 +88,16 @@ const VirtualScroll: FC<Props> = ({ data, uniqueKey, itemFixedHeight, visibleCou
                     if (index === visibleData.length - 1 ) {
                         return (
                             <Box 
-                                opacity={0.5}
-                                id={BOTTOM_SENTINEL_ID} 
                                 ref={bottomSentinelRef} 
-                                height={`${itemFixedHeight}px`} 
-                                key={`${item[uniqueKey]}-${index}`}
+                                height={itemHeight} 
+                                key={key}
                             >
                                 {itemRender(item, index)}
                             </Box>
                         )
                     }
                     return ( 
-                        <Box height={`${itemFixedHeight}px`} key={`${item[uniqueKey]}-${index}`}>
+                        <Box height={itemHeight} key={key}>
                             {itemRender(item, index)}
                         </Box>
                     )

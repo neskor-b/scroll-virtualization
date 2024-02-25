@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { ChakraProvider } from '@chakra-ui/react'
 
 // UI
@@ -16,6 +16,7 @@ import VirtualScroll from 'components/VirtualScroll';
 
 // hooks
 import useArticles from 'hooks/useArticle';
+
 
 function App() {
   const { articles, isLoading, params, hasNext, changeParam } = useArticles();
@@ -36,9 +37,13 @@ function App() {
             <Search value={params.q} onChange={e => changSearch(e.target.value)} />
             <VirtualScroll 
                 data={articles}
-                uniqueKey='title'
-                itemFixedHeight={170}
-                visibleCount={params.pageSize}
+                uniqKey='title'
+                config={{
+                      itemFixedHeight: 170,
+                      visibleCount: params.pageSize,
+                      bufferCount: 1,
+                      listGap: 10
+                }}
                 itemRender={article => <NewsItem article={article} />}
                 onScrollDown={changePageHandler}
             />
