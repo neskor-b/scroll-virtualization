@@ -41,7 +41,7 @@ function App() {
                 config={{
                       itemFixedHeight: 170,
                       visibleCount: params.pageSize,
-                      bufferCount: 1,
+                      bufferCount: 10,
                       listGap: 10
                 }}
                 itemRender={article => <NewsItem article={article} />}
